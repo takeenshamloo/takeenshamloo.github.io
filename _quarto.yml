@@ -3,18 +3,23 @@ project:
   output-dir: docs
 
 website:
-  title: "takeenshamloo.github.io"
+  title: "Takeen Shamloo"
   navbar:
     left:
       - href: index.qmd
         text: Home
       - about.qmd
+      - href: blog.qmd
+        text: Blog
 
 format:
   html:
-    theme: cosmo
+    theme: 
+      light: lux
+      dark: slate
     css: styles.css
     toc: true
+    page-layout: full
 
 editor: visual
 

@@ -9,8 +9,15 @@
   {
     "objectID": "index.html",
     "href": "index.html",
-    "title": "takeenshamloo.github.io",
+    "title": "Takeen Shamloo",
     "section": "",
-    "text": "This is a Quarto website.\nTo learn more about Quarto websites visit https://quarto.org/docs/websites.\n\n1 + 1\n\n[1] 2"
+    "text": "Hello! My name is Takeen Shamloo, I am an aspiring Data Scientist and I love to program all sorts of things. I specialize in mobile apps and I don’t shy away from a good challenge."
+  },
+  {
+    "objectID": "blog.html",
+    "href": "blog.html",
+    "title": "Blog Posts",
+    "section": "",
+    "text": "Here will be where I post my blogs!"
   }
 ]
