@@ -1,72 +1,9 @@
 [
   {
-    "objectID": "about.html",
-    "href": "about.html",
-    "title": "About",
-    "section": "",
-    "text": "About this site\n\n1 + 1\n\n[1] 2"
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Takeen Shamloo",
-    "section": "",
-    "text": "Hello! My name is Takeen Shamloo, I am an aspiring Data Scientist and I love to program all sorts of things. I specialize in mobile apps and I don’t shy away from a good challenge."
-  },
-  {
     "objectID": "blog.html",
     "href": "blog.html",
-    "title": "Biodiversity Intactness Analysis for Phoenix Subdivision",
+    "title": "My Blogs",
     "section": "",
-    "text": "View full repo: GitHub Link"
-  },
-  {
-    "objectID": "blog.html#author-takeen-shamloo",
-    "href": "blog.html#author-takeen-shamloo",
-    "title": "Biodiversity Intactness Analysis for Phoenix Subdivision",
-    "section": "",
-    "text": "View full repo: GitHub Link"
-  },
-  {
-    "objectID": "blog.html#about",
-    "href": "blog.html#about",
-    "title": "Biodiversity Intactness Analysis for Phoenix Subdivision",
-    "section": "About",
-    "text": "About\n\nPurpose\nThis notebook analyzes the Biodiversity Intactness Index (BII) within the Phoenix subdivision for the years 2017 and 2020. It calculates biodiversity loss, visualizes the results, and identifies areas where biodiversity was maintained or declined.\n\n\nHighlights\n\nData exploration and masking of biodiversity data.\nVisualization of BII values for 2017 and 2020.\nOverlay of biodiversity loss with transparent backgrounds.\nCalculation of the percentage of area with biodiversity changes.\n\n\n\nAbout the Data\nThe BII data was sourced from the Microsoft Planetary Computer and focuses on the Phoenix, AZ area. The dataset provides rasterized BII values for 2017 and 2020.\n\n\nReferences\n\nMicrosoft Planetary Computer. (n.d.). Biodiversity intactness data. Retrieved from https://planetarycomputer.microsoft.com\nGeoPandas contributors. (n.d.). GeoPandas documentation. Retrieved from https://geopandas.org\nRasterio contributors. (n.d.). Rasterio documentation. Retrieved from https://rasterio.readthedocs.io\nU.S. Census Bureau. (n.d.). Census County Subdivision shapefiles for Arizona. Retrieved from https://www.census.gov/geographies/mapping-files.html\n\n\n# Import required libraries\nimport geopandas as gpd\nimport matplotlib.pyplot as plt\nimport rasterio\nfrom rasterio.mask import mask\nimport numpy as np\n\n# For importing BII Data from Microsoft\nfrom pystac_client import Client\nimport planetary_computer as pc\nimport requests\n\n\n\nCode below is used to generate BII Data for 2017/2020\n\nShould only be ran if needed to generate files again."
-  },
-  {
-    "objectID": "blog.html#data-loading-and-exploration",
-    "href": "blog.html#data-loading-and-exploration",
-    "title": "Biodiversity Intactness Analysis for Phoenix Subdivision",
-    "section": "1. Data Loading and Exploration",
-    "text": "1. Data Loading and Exploration\n\n1.1 Phoenix Subdivision Shapefilez\nThis section loads the Phoenix subdivision shapefile and filters it to extract the relevant geometry for analysis.\n\n# Load Phoenix subdivision shapefile\nshapefile_path = \"data/tl_2020_04_cousub/tl_2020_04_cousub.shp\"\ncounty_subdivisions = gpd.read_file(shapefile_path)\n\n# Validate shapefile\nassert not county_subdivisions.empty, \"Error: Shapefile is empty.\"\n\n# Filter for Maricopa County and Phoenix subdivision\nmaricopa_subdivisions = county_subdivisions[county_subdivisions[\"COUNTYFP\"] == \"013\"]\nphoenix_subdivision = maricopa_subdivisions[maricopa_subdivisions[\"NAME\"].str.contains(\"Phoenix\")]\n\n# Validate Phoenix subdivision\nassert not phoenix_subdivision.empty, \"Error: Phoenix subdivision filter returned no results.\"\n\n# Plot the Phoenix subdivision for verification\nfig, ax = plt.subplots(figsize=(10, 8))\nphoenix_subdivision.boundary.plot(ax=ax, edgecolor=\"blue\")\nplt.title(\"Phoenix Subdivision Boundary\")\nplt.show()"
-  },
-  {
-    "objectID": "blog.html#biodiversity-intactness-index-bii-rasters",
-    "href": "blog.html#biodiversity-intactness-index-bii-rasters",
-    "title": "Biodiversity Intactness Analysis for Phoenix Subdivision",
-    "section": "1.2 Biodiversity Intactness Index (BII) Rasters",
-    "text": "1.2 Biodiversity Intactness Index (BII) Rasters\n\n# Load and validate the BII rasters for 2017 and 2020\nbii_2017 = rasterio.open(\"data/bii_2017.tif\")\nbii_2020 = rasterio.open(\"data/bii_2020.tif\")"
-  },
-  {
-    "objectID": "blog.html#data-masking-and-visualization",
-    "href": "blog.html#data-masking-and-visualization",
-    "title": "Biodiversity Intactness Analysis for Phoenix Subdivision",
-    "section": "2. Data Masking and Visualization",
-    "text": "2. Data Masking and Visualization\n\n2.1 Masking BII Data\n\n# Ensure CRS alignment between rasters and Phoenix subdivision\nif phoenix_subdivision.crs != bii_2017.crs:\n    phoenix_subdivision = phoenix_subdivision.to_crs(bii_2017.crs)\n    print(\"Phoenix subdivision reprojected to match raster CRS.\")\n\n# Define a function to mask raster data\ndef mask_raster(raster, shapefile):\n    shapes = [geometry.__geo_interface__ for geometry in shapefile.geometry]\n    masked, transform = mask(raster, shapes, crop=True)\n    assert masked.size &gt; 0, \"Error: Masked raster is empty.\"\n    return masked[0], transform\n\n# Mask the 2017 and 2020 rasters\nmasked_bii_2017, transform_bii_2017 = mask_raster(bii_2017, phoenix_subdivision)\nmasked_bii_2020, transform_bii_2020 = mask_raster(bii_2020, phoenix_subdivision)\n\nPhoenix subdivision reprojected to match raster CRS.\n\n\n\n\n2.2 Visualizing Biodiversity Loss\n\n# Plot the masked 2020 raster\nplt.figure(figsize = (10, 8))\nplt.imshow(masked_bii_2020, cmap = \"Greens\", interpolation = \"none\")\nplt.colorbar(label = \"Biodiversity Intactness (2020)\")\nplt.title(\"Masked BII Data in Phoenix Subdivision\")\nplt.xlabel(\"Raster Column\")\nplt.ylabel(\"Raster Row\")\nplt.show()"
-  },
-  {
-    "objectID": "blog.html#biodiversity-loss-analysis",
-    "href": "blog.html#biodiversity-loss-analysis",
-    "title": "Biodiversity Intactness Analysis for Phoenix Subdivision",
-    "section": "3. Biodiversity Loss Analysis",
-    "text": "3. Biodiversity Loss Analysis\n\n3.1 Calculating Biodiversity Loss\n\n# Identify areas with biodiversity loss (BII &gt;= 0.75 in 2017 but &lt; 0.75 in 2020)\nloss_mask = (masked_bii_2017 &gt;= 0.75) & (masked_bii_2020 &lt; 0.75)\n\n# Calculate loss percentage\ntotal_pixels = masked_bii_2017.size\nloss_pixels = np.sum(loss_mask)\nloss_percentage = (loss_pixels / total_pixels) * 100\nprint(f\"Percentage of area with biodiversity loss: {loss_percentage:.2f}%\")\n\nPercentage of area with biodiversity loss: 0.38%\n\n\n\n\n3.2 Visualizing Biodiversity Loss\n\n# Plot biodiversity loss\nplt.figure(figsize=(10, 8))\nplt.imshow(loss_mask, cmap=\"Reds\", interpolation=\"none\", alpha=0.6)\nplt.colorbar(label=\"Biodiversity Loss (2017 -&gt; 2020)\")\nplt.title(\"Biodiversity Loss in Phoenix Subdivision\")\nplt.xlabel(\"Raster Column\")\nplt.ylabel(\"Raster Row\")\nplt.show()\n\n\n\n\n\n\n\n\n\n\n3.3 Overlaying Biodiversity Loss\n\n# Prepare the loss mask for visualization with transparency\nloss_mask_with_nan = np.where(loss_mask, 1, np.nan)  # Set True values to 1, others to NaN\n\n# Plot the masked BII data as the base layer\nplt.figure(figsize=(10, 8))\nplt.imshow(masked_bii_2020, cmap=\"Greens\", interpolation=\"none\", label=\"Biodiversity Intactness (2020)\")\n\n# Plot only the red loss mask with a transparent background\nplt.imshow(loss_mask_with_nan, cmap=\"Reds\", interpolation=\"none\")\nplt.colorbar(label=\"Biodiversity Loss (2017 -&gt; 2020)\")\nplt.title(\"Biodiversity Loss in Phoenix Subdivision (Red Mask Only)\")\nplt.xlabel(\"Raster Column\")\nplt.ylabel(\"Raster Row\")\nplt.show()\n\n\n\n\n\n\n\n\n\n\n4.1 Percentage of Area with BII ≥ 0.75 in 2017\n\n# Calculate percentage of area with BII &gt;= 0.75 in 2017\ntotal_pixels_2017 = masked_bii_2017.size\npixels_bii_2017_high = np.sum(masked_bii_2017 &gt;= 0.75)\npercentage_bii_2017_high = (pixels_bii_2017_high / total_pixels_2017) * 100\n\nprint(f\"Percentage of area with BII &gt;= 0.75 in 2017: {percentage_bii_2017_high:.2f}%\")\n\nPercentage of area with BII &gt;= 0.75 in 2017: 4.17%\n\n\n\n\n4.2 Percentage of Area with BII ≥ 0.75 in 2020\n\n# Calculate percentage of area with BII &gt;= 0.75 in 2020\ntotal_pixels_2020 = masked_bii_2020.size\npixels_bii_2020_high = np.sum(masked_bii_2020 &gt;= 0.75)\npercentage_bii_2020_high = (pixels_bii_2020_high / total_pixels_2020) * 100\n\nprint(f\"Percentage of area with BII &gt;= 0.75 in 2020: {percentage_bii_2020_high:.2f}%\")\n\nPercentage of area with BII &gt;= 0.75 in 2020: 3.80%"
-  },
-  {
-    "objectID": "blogq.html",
-    "href": "blogq.html",
-    "title": "Blog Posts",
-    "section": "",
-    "text": "Here will be where I post my blogs!"
+    "text": "Biodiversity Intactness Analysis for Phoenix Subdivision\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nVisualizing and Understanding the Thomas Fire\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items"
   }
 ]
