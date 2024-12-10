@@ -8,3 +8,6 @@
 .httr-oauth
 .DS_Store
 .quarto
+
+# Hide data folder from git ignore
+data/*
