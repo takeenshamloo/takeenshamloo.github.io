@@ -105,7 +105,7 @@ This section loads the Phoenix subdivision shapefile and filters it to extract t
 
 ```{python}
 # Load Phoenix subdivision shapefile
-shapefile_path = "../data/tl_2020_04_cousub/tl_2020_04_cousub.shp"
+shapefile_path = "data/tl_2020_04_cousub/tl_2020_04_cousub.shp"
 county_subdivisions = gpd.read_file(shapefile_path)
 
 # Validate shapefile
@@ -129,8 +129,8 @@ plt.show()
 
 ```{python}
 # Load and validate the BII rasters for 2017 and 2020
-bii_2017 = rasterio.open("../data/bii_2017.tif")
-bii_2020 = rasterio.open("../data/bii_2020.tif")
+bii_2017 = rasterio.open("data/bii_2017.tif")
+bii_2020 = rasterio.open("data/bii_2020.tif")
 ```
 
 ## 2. Data Masking and Visualization
